@@ -57,6 +57,13 @@ def _modify_config(gpt_cfg, cfg, add_cfg_to_tree=False):
     OmegaConf.set_struct(gpt_cfg, True)
     OmegaConf.resolve(cfg)
     with open_dict(gpt_cfg):
+        gpt_cfg.use_embedmix = cfg.model.get("use_embedmix", True)
+        gpt_cfg.subset_perturb = cfg.model.get("subset_perturb", 0.1)
+        gpt_cfg.embedding_perturb = cfg.model.get("embedding_perturb", 0.2)
+        gpt_cfg.perturb_tokens_per_seq = cfg.model.get("perturb_tokens_per_seq", 0.3)
+        gpt_cfg.augment_type = cfg.model.get("augment_type", "addition")
+        gpt_cfg.alpha = cfg.model.get("alpha", 0.4)
+
         gpt_cfg.megatron_amp_O2 = cfg.model.get("megatron_amp_O2", False)
         gpt_cfg.micro_batch_size = cfg.model.data.train_ds.micro_batch_size
         gpt_cfg.global_batch_size = cfg.model.data.train_ds.global_batch_size

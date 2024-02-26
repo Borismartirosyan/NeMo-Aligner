@@ -1,5 +1,5 @@
 name: megatron_gpt_sft
-
+# PYTHONPATH="/bmartirosyan/code/NeMo/:/bmartirosyan/code/NeMo-Aligner/:/bmartirosyan/code/Megatron-LM/:$PYTHONPATH" python /bmartirosyan/code/NeMo-Aligner/examples/nlp/gpt/train_gpt_sft.py
 trainer:
   num_nodes: 1
   devices: 1
@@ -13,7 +13,7 @@ trainer:
     val_check_interval: 100
     save_interval: ${.val_check_interval}
 
-    limit_val_batches: 1.0
+    limit_val_batches: 1
     gradient_clip_val: 1.0
 
     # can be used to register any custom metrics that require token-by-token generation
@@ -56,7 +56,7 @@ model:
   seed: 1234
   tensor_model_parallel_size: 1 # intra-layer model parallelism
   pipeline_model_parallel_size: 1 # inter-layer model parallelism
-  restore_from_path: ??? # Path to an existing p-tuned/prompt tuned .nemo model you wish to add new tasks to or run inference with
+  restore_from_path: /bmartirosyan/info/models/GPT-2B-001_bf16_mcore.nemo # Path to an existing p-tuned/prompt tuned .nemo model you wish to add new tasks to or run inference with
   resume_from_checkpoint: null # The path to a checkpoint file to continue the training, restores the whole state including the epoch, step, LR schedulers, apex, etc.
   save_nemo_on_validation_end: True # Saves an inference ready .nemo file every time a checkpoint is saved during training.
   sync_batch_comm: False
@@ -144,9 +144,9 @@ model:
       #   - /path/to/boolq.jsonl
       # Example of how each dataset is formatted
       # {'input': 'John von Neumann\nVon Neumann made fundamental contributions .... Q: What did the math of artificial viscosity do?', 'output': 'smoothed the shock transition without sacrificing basic physics'}
-      file_path: ??? # Path to a JSONL file corresponding to the source data. Data format is identical to validation_ds.
+      file_path: /bmartirosyan/info/data/train_0.jsonl # Path to a JSONL file corresponding to the source data. Data format is identical to validation_ds.
       global_batch_size: 128
-      micro_batch_size: 1
+      micro_batch_size: 16
       shuffle: True
       memmap_workers: null
       max_seq_length: 2048
@@ -168,14 +168,14 @@ model:
       truncation_method: 'right' # Truncation from which position, Options: ['left', 'right']
 
     validation_ds:
-      file_path: ??? # Path to a JSONL file corresponding to the source data. Data format is identical to validation_ds.
+      file_path: /bmartirosyan/info/data/validation_0.jsonl # Path to a JSONL file corresponding to the source data. Data format is identical to validation_ds.
       global_batch_size: ${model.data.train_ds.global_batch_size}
       micro_batch_size: ${model.data.train_ds.micro_batch_size}
       shuffle: False
       memmap_workers: ${model.data.train_ds.memmap_workers}
       max_seq_length: ${model.data.train_ds.max_seq_length}
       min_seq_length: 1
-      drop_last: False
+      drop_last: True
       label_key: ${model.data.train_ds.label_key}
       add_eos: ${model.data.train_ds.add_eos}
       add_sep: ${model.data.train_ds.add_sep}
